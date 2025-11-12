@@ -28,10 +28,26 @@ def display_board(board, reveal=False):
         print(f"{i} " + " ".join(row_display))
     print()
 
-def main():
+def play_game():
     board, mine_positions = create_board(ROWS, COLS, MINES)
     print("Welcome to Minefield! ⚡")
     display_board(board)
 
+    while True:
+        try:
+            r = int(input("Enter row: "))
+            c = int(input("Enter column: "))
+        except ValueError:
+            print("Invalid input. Please enter numbers only.")
+            continue
+
+        if (r, c) in mine_positions:
+            print("💥 Boom! You hit a mine!")
+            display_board(board, reveal=True)
+            break
+
+        print("Safe! You can continue playing...")
+        display_board(board)
+
 if __name__ == "__main__":
-    main()
+    play_game()
