@@ -56,7 +56,7 @@ def play_game():
         if (r, c) in mine_positions:
             print("💥 Boom! You hit a mine!")
             display_board(board, reveal=True)
-            break
+            return
 
         if (r, c) in revealed:
             print("Already revealed!")
@@ -69,9 +69,17 @@ def play_game():
         if len(revealed) == safe_cells:
             print("🎉 Congratulations! You cleared the minefield!")
             display_board(board, reveal=True)
-            break
+            return
 
         display_board(board)
 
+def main():
+    while True:
+        play_game()
+        again = input("Play again? (y/n): ").strip().lower()
+        if again != 'y':
+            print("Thanks for playing Minefield! 🧨")
+            break
+
 if __name__ == "__main__":
-    play_game()
+    main()
