@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import random
 
 ROWS = 5
@@ -9,12 +10,13 @@ class MinefieldGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Minefield ⚡")
-        self.create_board()
-        self.create_grid()
+        self.start_game()
 
-    def create_board(self):
+    def start_game(self):
         self.board = [['.' for _ in range(COLS)] for _ in range(ROWS)]
         self.mines = set()
+        self.revealed = set()
+        self.safe_cells = ROWS * COLS - MINES
 
         while len(self.mines) < MINES:
             r = random.randint(0, ROWS - 1)
@@ -23,7 +25,12 @@ class MinefieldGUI:
         for r, c in self.mines:
             self.board[r][c] = 'M'
 
+        self.create_grid()
+
     def create_grid(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
         self.buttons = []
         for r in range(ROWS):
             row_buttons = []
@@ -47,15 +54,29 @@ class MinefieldGUI:
 
     def on_click(self, r, c):
         if (r, c) in self.mines:
-            self.buttons[r][c].config(text="💣", bg="red")
             self.reveal_mines()
-        else:
+            messagebox.showerror("Game Over", "💥 You hit a mine! Game over!")
+            self.ask_restart()
+        elif (r, c) not in self.revealed:
+            self.revealed.add((r, c))
             count = self.count_adjacent_mines(r, c)
             self.buttons[r][c].config(text=str(count), state="disabled", bg="lightgrey")
+
+            if len(self.revealed) == self.safe_cells:
+                self.reveal_mines()
+                messagebox.showinfo("You Win!", "🎉 Congratulations! You cleared the minefield!")
+                self.ask_restart()
 
     def reveal_mines(self):
         for (r, c) in self.mines:
             self.buttons[r][c].config(text="💣", bg="red", state="disabled")
+
+    def ask_restart(self):
+        answer = messagebox.askyesno("Restart?", "Do you want to play again?")
+        if answer:
+            self.start_game()
+        else:
+            self.root.quit()
 
 if __name__ == "__main__":
     root = tk.Tk()
